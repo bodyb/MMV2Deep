@@ -159,11 +159,11 @@ public class YellowBasket extends LinearOpMode {
                                 intake.ClawClosed(),
                                 new ParallelAction(
                                         follower.follow(toRung),
-                                        slide.HighBar()
+                                        slide.HighBasket()
                                 ),
-                                slide.UnClip(),
-                                new SleepAction(0.1),
-                                intake.ClawOpen(),
+                                intake.autoCycleWheelOut(),
+                                new SleepAction(0.5),
+                                intake.autoCycleWheelStop(),
                                 new ParallelAction(
                                         slide.Base(),
                                         follower.follow(toFirst),
