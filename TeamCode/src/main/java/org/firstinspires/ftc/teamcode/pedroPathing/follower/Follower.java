@@ -19,8 +19,12 @@ import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstan
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.useSecondaryHeadingPID;
 import static org.firstinspires.ftc.teamcode.pedroPathing.tuning.FollowerConstants.useSecondaryTranslationalPID;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.config.Config;
 import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
@@ -152,6 +156,12 @@ public class Follower {
         initialize();
     }
 
+    public Follower(HardwareMap hardwareMap, Pose startPose) {
+        this.hardwareMap = hardwareMap;
+        initialize(startPose);
+        setCurrentPoseWithOffset(startPose);
+    }
+
     /**
      * This initializes the follower.
      * In this, the DriveVectorScaler and PoseUpdater is instantiated, the drive motors are
@@ -166,6 +176,39 @@ public class Follower {
         leftRear = hardwareMap.get(DcMotorEx.class, leftRearMotorName);
         rightRear = hardwareMap.get(DcMotorEx.class, rightRearMotorName);
         rightFront = hardwareMap.get(DcMotorEx.class, rightFrontMotorName);
+
+        // TODO: Make sure that this is the direction your motors need to be reversed in.
+        leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
+        leftRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightRear.setDirection(DcMotorSimple.Direction.REVERSE);
+        rightFront.setDirection(DcMotorSimple.Direction.REVERSE);
+
+        motors = Arrays.asList(leftFront, leftRear, rightFront, rightRear);
+
+        for (DcMotorEx motor : motors) {
+            MotorConfigurationType motorConfigurationType = motor.getMotorType().clone();
+            motorConfigurationType.setAchieveableMaxRPMFraction(1.0);
+            motor.setMotorType(motorConfigurationType);
+        }
+
+        for (DcMotorEx motor : motors) {
+            motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        }
+
+        dashboardPoseTracker = new DashboardPoseTracker(poseUpdater);
+
+        breakFollowing();
+    }
+
+    public void initialize(Pose startPose) {
+        driveVectorScaler = new DriveVectorScaler(FollowerConstants.frontLeftVector);
+        poseUpdater = new PoseUpdater(hardwareMap, startPose);
+
+        leftFront = hardwareMap.get(DcMotorEx.class, leftFrontMotorName);
+        leftRear = hardwareMap.get(DcMotorEx.class, leftRearMotorName);
+        rightRear = hardwareMap.get(DcMotorEx.class, rightRearMotorName);
+        rightFront = hardwareMap.get(DcMotorEx.class, rightFrontMotorName);
+
 
         // TODO: Make sure that this is the direction your motors need to be reversed in.
         leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
@@ -455,6 +498,102 @@ public class Follower {
         if (drawOnDashboard) {
             dashboardPoseTracker.update();
         }
+    }
+
+    public class FollowerUpdate implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            update();
+            return true;
+        }
+    }
+
+    public Action followerUpdate() {
+        return new FollowerUpdate();
+    }
+
+    public class FollowAction implements Action {
+
+        Path a = null;
+        PathChain b = null;
+        boolean pathChain = false, called = false, hold = false;
+
+        public FollowAction(Path a) {
+            this.a = a;
+        }
+
+        public FollowAction(PathChain b) {
+            pathChain = true;
+            this.b = b;
+        }
+
+        public FollowAction(Path a, boolean hold) {
+            this.a = a;
+            this.hold = hold;
+        }
+
+        public FollowAction(PathChain b, boolean hold) {
+            pathChain = true;
+            this.b = b;
+            this.hold = hold;
+        }
+
+
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if(!called) {
+                if(pathChain) followPath(b, hold);
+                else followPath(a, hold);
+                called = true;
+            }
+            return isBusy;
+        }
+    }
+
+    public Action follow(Path a) {
+        return new FollowAction(a);
+    }
+
+    public Action follow(PathChain b) {
+        return new FollowAction(b);
+    }
+
+    public Action follow(Path a, boolean hold) {
+        return new FollowAction(a, hold);
+    }
+
+    public Action follow(PathChain b, boolean hold) {
+        return new FollowAction(b, hold);
+    }
+
+
+
+    public class WaitToDone implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            return isBusy;
+        }
+    }
+
+    public Action waitUntilDone() {
+        return new WaitToDone();
+    }
+
+
+
+    public class FollowUntilDone implements Action {
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            return isBusy;
+        }
+    }
+
+    public Action followUntilDone() {
+        return new FollowUntilDone();
     }
 
     /**
