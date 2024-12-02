@@ -47,7 +47,7 @@ public class FiveClip extends LinearOpMode {
     private Pose startPose = new Pose(9.244, 65.422);
     private Pose highRung = new Pose(39.500, 65.422);
 
-    private double backDistance = 34;
+    private double backDistance = 30;
     private Pose block1 = new Pose(44.444,26.667);
     private Pose block2 = new Pose(44.444, 16.167);
     private Pose block3 = new Pose(44.444, 6.22);
@@ -55,7 +55,7 @@ public class FiveClip extends LinearOpMode {
 
     private Pose grabPoint2 = new Pose(10, 40.000, Math.PI/2);
 
-    private Pose grabSide = new Pose(25.26, 18.244);
+    private Pose grabSide = new Pose(15.26, 18.244);
 
 
     PathChain toRung, pushBlocks, toClip2, toGrab3, toClip3, toGrab4, toClip4, toGrab5, toClip5, toPark;
@@ -98,7 +98,6 @@ public class FiveClip extends LinearOpMode {
                         new Point(block2.getX() + 12.5, block2.getY() + 4, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(highRung.getHeading())
                 //push block 2
-
                 .addPath(new BezierLine(
                         new Point(block2.getX() + 12.5, block2.getY() + 4,Point.CARTESIAN),
                         new Point(backDistance, 20.167, Point.CARTESIAN)))
@@ -113,11 +112,11 @@ public class FiveClip extends LinearOpMode {
                 //push block 3
                 .addPath(new BezierLine(
                         new Point(block3.getX() + 12.5, block3.getY() + 7,Point.CARTESIAN),
-                        new Point(backDistance, 12.167, Point.CARTESIAN)))
+                        new Point(backDistance, 13.167, Point.CARTESIAN)))
                 .setTangentHeadingInterpolation()
                 .setReversed(true)
                 .addPath(new BezierLine(
-                        new Point(backDistance, 12.167, Point.CARTESIAN),
+                        new Point(backDistance, 13.167, Point.CARTESIAN),
                         new Point(grabSide)
                 ))
                 .setLinearHeadingInterpolation(highRung.getHeading(), 3*Math.PI/2)
