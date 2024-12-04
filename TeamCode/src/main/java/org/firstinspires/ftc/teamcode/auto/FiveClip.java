@@ -53,9 +53,9 @@ public class FiveClip extends LinearOpMode {
     private Pose block3 = new Pose(44.444, 6.22);
     private Pose grabPoint = new Pose(15, 40.000, Math.PI/2);
 
-    private Pose grabPoint2 = new Pose(10, 40.000, Math.PI/2);
+    private Pose grabPoint2 = new Pose(9.75, 40.000, Math.PI/2);
 
-    private Pose grabSide = new Pose(15.26, 18.244);
+    private Pose grabSide = new Pose(22.26, 22.244);
 
 
     PathChain toRung, pushBlocks, toClip2, toGrab3, toClip3, toGrab4, toClip4, toGrab5, toClip5, toPark;
@@ -81,7 +81,7 @@ public class FiveClip extends LinearOpMode {
                 //to block 1
                 .addPath(new BezierCurve(
                         new Point(highRung),
-                        new Point(18.133, 18.489, Point.CARTESIAN),
+                        new Point(17.133, 18.489, Point.CARTESIAN),
                         new Point(59.378,47.111,Point.CARTESIAN),
                         new Point(block1.getX() + 10.5, block1.getY() + 2,Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(highRung.getHeading())
@@ -107,30 +107,30 @@ public class FiveClip extends LinearOpMode {
                 .addPath(new BezierCurve(
                         new Point(backDistance, 20.167, Point.CARTESIAN),
                         new Point(59.743, 21.167, Point.CARTESIAN),
-                        new Point(block3.getX() + 12.5, block3.getY() + 7, Point.CARTESIAN)))
+                        new Point(block3.getX() + 12.5, block3.getY() + 6, Point.CARTESIAN)))
                 .setConstantHeadingInterpolation(highRung.getHeading())
                 //push block 3
                 .addPath(new BezierLine(
-                        new Point(block3.getX() + 12.5, block3.getY() + 7,Point.CARTESIAN),
-                        new Point(backDistance, 13.167, Point.CARTESIAN)))
+                        new Point(block3.getX() + 12.5, block3.getY() + 6,Point.CARTESIAN),
+                        new Point(backDistance, 12.167, Point.CARTESIAN)))
                 .setTangentHeadingInterpolation()
                 .setReversed(true)
                 .addPath(new BezierLine(
-                        new Point(backDistance, 13.167, Point.CARTESIAN),
+                        new Point(backDistance, 12.167, Point.CARTESIAN),
                         new Point(grabSide)
                 ))
                 .setLinearHeadingInterpolation(highRung.getHeading(), 3*Math.PI/2)
                 .addPath(new BezierLine(
                         new Point(grabSide),
-                        new Point(grabSide.getX(), grabSide.getY()-6)
+                        new Point(grabSide.getX()-9, grabSide.getY()-10)
                 ))
-                .setTangentHeadingInterpolation()
+                .setConstantHeadingInterpolation(3*Math.PI/2)
                 .build();
 
         toClip2 = follower.pathBuilder()
                 .addPath(new BezierCurve(
-                        new Point(grabSide.getX(), grabSide.getY()-5),
-                        new Point(24, 69, Point.CARTESIAN),
+                        new Point(grabSide.getX()-5, grabSide.getY()-6),
+                        new Point(14, 69, Point.CARTESIAN),
                         new Point(highRung.getX()-1.2, highRung.getY()+0.5)
                 ))
                 .setLinearHeadingInterpolation(3*Math.PI/2, highRung.getHeading())
@@ -186,7 +186,7 @@ public class FiveClip extends LinearOpMode {
                 .setLinearHeadingInterpolation(highRung.getHeading(), Math.PI)
                 .addPath(new BezierLine(
                         new Point(grabPoint),
-                        new Point(grabPoint2)
+                        new Point(grabPoint2.getX()-0.5,grabPoint2.getY())
                 ))
                 .setTangentHeadingInterpolation()
                 .build();
@@ -202,7 +202,7 @@ public class FiveClip extends LinearOpMode {
         toPark = follower.pathBuilder()
                 .addPath(new BezierLine(
                         new Point(highRung.getX(), highRung.getY()+2),
-                        new Point(grabPoint2.getX(), grabPoint2.getY()-10)
+                        new Point(0,0,Point.CARTESIAN)
                 ))
                 .setConstantHeadingInterpolation(highRung.getHeading())
                 .build();
@@ -227,59 +227,59 @@ public class FiveClip extends LinearOpMode {
                                         slide.HighBar()
                                 ),
                                 slide.UnClip(),
-                                new SleepAction(0.1),
+                                new SleepAction(0.06),
                                 intake.ClawOpen(),
                                 new ParallelAction(
                                         slide.Base(),
                                         follower.follow(pushBlocks)
                                 ),
                                 intake.ClawClosed(),
-                                new SleepAction(0.5),
+                                new SleepAction(0.075),
                                 new ParallelAction(
                                         slide.HighBar(),
                                         follower.follow(toClip2)
                                 ),
                                 slide.UnClip(),
-                                new SleepAction(0.1),
+                                new SleepAction(0.06),
                                 intake.ClawOpen(),
                                 new ParallelAction(
                                         slide.Base(),
                                         follower.follow(toGrab3)
                                 ),
                                 intake.ClawClosed(),
-                                new SleepAction(0.175),
+                                new SleepAction(0.075),
                                 new ParallelAction(
                                         slide.HighBar(),
                                         follower.follow(toClip3)
                                 ),
                                 slide.UnClip(),
-                                new SleepAction(0.1),
+                                new SleepAction(0.075),
                                 intake.ClawOpen(),
                                 new ParallelAction(
                                         slide.Base(),
                                         follower.follow(toGrab4)
                                 ),
                                 intake.ClawClosed(),
-                                new SleepAction(0.175),
+                                new SleepAction(0.075),
                                 new ParallelAction(
                                         slide.HighBar(),
                                         follower.follow(toClip4)
                                 ),
                                 slide.UnClip(),
-                                new SleepAction(0.1),
+                                new SleepAction(0.075),
                                 intake.ClawOpen(),
                                 new ParallelAction(
                                         slide.Base(),
                                         follower.follow(toGrab5)
                                 ),
                                 intake.ClawClosed(),
-                                new SleepAction(0.175),
+                                new SleepAction(0.075),
                                 new ParallelAction(
                                         slide.HighBar(),
                                         follower.follow(toClip5)
                                 ),
                                 slide.UnClip(),
-                                new SleepAction(0.1),
+                                new SleepAction(0.075),
                                 intake.ClawOpen(),
                                 new ParallelAction(
                                         slide.Base(),
