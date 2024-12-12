@@ -38,6 +38,8 @@ public class MMMM extends OpMode {
     public double speedModTwo = 0.25;
     public double speedModTurn = 0.5;
 
+    public double speedModSlide = 1;
+
     public int intakeCycleDirection = 1;
     public static int flipDrive = -1;
 
@@ -112,6 +114,13 @@ public class MMMM extends OpMode {
         //if (gamepad2.left_trigger >= 0.25) {intakeCycleDirection = -1;}
         //if (gamepad2.right_trigger <= 0.25 && gamepad2.left_trigger <= 0.25) {intakeCycleDirection = 0;}
 
+        if (gamepad2.left_trigger > 0.3) {
+            speedModSlide = 0.5;
+        }
+        else {
+            speedModSlide = 1;
+        }
+
         intake.cycleIntake(intakeCycleDirection);
 
         //slide.setCentralLift(-gamepad2.left_stick_y);
@@ -131,7 +140,7 @@ public class MMMM extends OpMode {
             }
         }
         else {
-            slide.setCentralLift(-gamepad2.left_stick_y);
+            slide.setCentralLift(-gamepad2.left_stick_y * speedModSlide);
             slide.setTargetPosition(slide.slide.getCurrentPosition());
         }
 

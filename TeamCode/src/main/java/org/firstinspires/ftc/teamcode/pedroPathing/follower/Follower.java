@@ -518,14 +518,27 @@ public class Follower {
         Path a = null;
         PathChain b = null;
         boolean pathChain = false, called = false, hold = false;
+        double timeOutContrast = 0;
+        double startTime = 0;
 
         public FollowAction(Path a) {
+            this.a = a;
+        }
+
+        public FollowAction(Path a, double timeOutContrast) {
+
             this.a = a;
         }
 
         public FollowAction(PathChain b) {
             pathChain = true;
             this.b = b;
+        }
+
+        public FollowAction(PathChain b, double timeOutContrast) {
+            pathChain = true;
+            this.b = b;
+            this.timeOutContrast = timeOutContrast;
         }
 
         public FollowAction(Path a, boolean hold) {
@@ -547,9 +560,18 @@ public class Follower {
                 if(pathChain) followPath(b, hold);
                 else followPath(a, hold);
                 called = true;
+                startTime = System.nanoTime();
+            }
+            if (System.nanoTime() - startTime > timeOutContrast && timeOutContrast != 0) {
+                breakFollowing();
+                return false;
             }
             return isBusy;
         }
+    }
+
+    public Action follow(Path a, double timeOutContrast) {
+        return new FollowAction(a, timeOutContrast);
     }
 
     public Action follow(Path a) {
@@ -559,6 +581,13 @@ public class Follower {
     public Action follow(PathChain b) {
         return new FollowAction(b);
     }
+
+    public Action follow(PathChain b, double timeOutContrast) {
+        return new FollowAction(b, timeOutContrast);
+    }
+
+
+
 
     public Action follow(Path a, boolean hold) {
         return new FollowAction(a, hold);
@@ -595,6 +624,8 @@ public class Follower {
     public Action followUntilDone() {
         return new FollowUntilDone();
     }
+
+
 
     /**
      * This calls an update to the PoseUpdater, which updates the robot's current position estimate.

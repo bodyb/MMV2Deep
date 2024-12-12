@@ -25,10 +25,14 @@ public class YellowBasket extends LinearOpMode {
     Follower follower;
     Slide slide;
     Intake intake;
-    private Pose startPose = new Pose(9.244, 80.889);
-    private Pose basketApproach = new Pose(16,128);
-    private Pose basketScore = new Pose(12,132);
-    PathChain toRung, toFirst, toScoreFirst, toSecond, toScoreSecond, toThird, toScoreThird, toPark;
+    private Pose startPose = new Pose(9.244, 104.889);
+    private Pose basketApproach = new Pose(26,118);
+    private Pose basketScore = new Pose(19,125);
+
+    private double blockXLine = 41.00;
+    private double blockXLine2 = 45.000;
+    private double blockXLine3 = 45.000;
+    PathChain toRung, toFirst, toFirsthalf, toScoreFirst, toSecond, toSecondhalf, toScoreSecond, toThird, toThirdhalf,toScoreThird, toPark;
     @Override
     public void runOpMode() throws InterruptedException {
 
@@ -39,11 +43,12 @@ public class YellowBasket extends LinearOpMode {
         Intake intake = new Intake(hardwareMap);
 
         toRung = follower.pathBuilder()
-                .addPath(new BezierLine(
+                .addPath(new BezierCurve(
                         new Point(startPose),
+                        new Point(30, 100, Point.CARTESIAN),
                         new Point(basketApproach)
                 ))
-                .setLinearHeadingInterpolation(startPose.getHeading(), 3*Math.PI/2)
+                .setTangentHeadingInterpolation()
                 .addPath(new BezierLine(
                         new Point(basketApproach),
                         new Point(basketScore)
@@ -54,16 +59,29 @@ public class YellowBasket extends LinearOpMode {
         toFirst = follower.pathBuilder()
                 .addPath(new BezierCurve(
                         new Point(basketScore),
-                        new Point(16.711, 131.378, Point.CARTESIAN),
-                        new Point(47.822, 92.444, Point.CARTESIAN),
-                        new Point(44.800, 118.222, Point.CARTESIAN)
+                        new Point(2, 122, Point.CARTESIAN),
+                        new Point(47, 102.5, Point.CARTESIAN),
+                        new Point(blockXLine, 111.222, Point.CARTESIAN)
                 ))
                 .setLinearHeadingInterpolation(startPose.getHeading(), Math.PI/2)
+                .addPath(new BezierLine(
+                        new Point(blockXLine, 111.222, Point.CARTESIAN),
+                        new Point(blockXLine, 113.222, Point.CARTESIAN)
+                ))
                 .build();
+
+        toFirsthalf = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Point(blockXLine, 111.222, Point.CARTESIAN),
+                        new Point(blockXLine, 113.222, Point.CARTESIAN)
+                ))
+                .setTangentHeadingInterpolation()
+                .build();
+
 
         toScoreFirst = follower.pathBuilder()
                 .addPath(new BezierLine(
-                        new Point(44.800, 118.222, Point.CARTESIAN),
+                        new Point(42.200, 113.222, Point.CARTESIAN),
                         new Point(basketApproach)
                 ))
                 .setLinearHeadingInterpolation(Math.PI/2, 3*Math.PI/4)
@@ -77,15 +95,28 @@ public class YellowBasket extends LinearOpMode {
         toSecond = follower.pathBuilder()
                 .addPath(new BezierCurve(
                         new Point(basketScore),
-                        new Point(44.800, 87.289, Point.CARTESIAN),
-                        new Point(45.511, 127.467, Point.CARTESIAN)
+                        new Point(44.800, 100, Point.CARTESIAN),
+                        new Point(blockXLine2, 114, Point.CARTESIAN)
                 ))
-                .setLinearHeadingInterpolation(3*Math.PI/2, Math.PI/2)
+                .setConstantHeadingInterpolation(Math.PI/2)
+                .addPath(new BezierLine(
+                        new Point(blockXLine2, 114, Point.CARTESIAN),
+                        new Point(blockXLine2, 123, Point.CARTESIAN)
+                ))
+                .setTangentHeadingInterpolation()
+                .build();
+
+        toSecondhalf = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Point(blockXLine2, 114, Point.CARTESIAN),
+                        new Point(blockXLine2, 123, Point.CARTESIAN)
+                ))
+                .setTangentHeadingInterpolation()
                 .build();
 
         toScoreSecond = follower.pathBuilder()
                 .addPath(new BezierLine(
-                        new Point(45.511, 127.467, Point.CARTESIAN),
+                        new Point(blockXLine2, 123, Point.CARTESIAN),
                         new Point(basketApproach)
                 ))
                 .setLinearHeadingInterpolation(Math.PI/2, 3*Math.PI/4)
@@ -99,14 +130,27 @@ public class YellowBasket extends LinearOpMode {
         toThird = follower.pathBuilder()
                 .addPath(new BezierCurve(
                         new Point(basketScore),
-                        new Point(47.289, 90.489, Point.CARTESIAN),
-                        new Point(45.689, 138.489, Point.CARTESIAN)
+                        new Point(47.289, 110.489, Point.CARTESIAN),
+                        new Point(blockXLine3, 120, Point.CARTESIAN)
                 ))
+                .setConstantHeadingInterpolation(Math.PI/2)
+                .addPath(new BezierLine(
+                        new Point(blockXLine3, 120, Point.CARTESIAN),
+                        new Point(blockXLine3, 130, Point.CARTESIAN)
+                ))
+                .build();
+
+        toThirdhalf = follower.pathBuilder()
+                .addPath(new BezierLine(
+                        new Point(blockXLine3, 120, Point.CARTESIAN),
+                        new Point(blockXLine3, 130, Point.CARTESIAN)
+                ))
+                .setTangentHeadingInterpolation()
                 .build();
 
         toScoreThird = follower.pathBuilder()
                 .addPath(new BezierLine(
-                        new Point(45.689, 138.489, Point.CARTESIAN),
+                        new Point(blockXLine3, 130, Point.CARTESIAN),
                         new Point(basketApproach)
                 ))
                 .setLinearHeadingInterpolation(Math.PI/2, 3*Math.PI/4)
@@ -121,13 +165,15 @@ public class YellowBasket extends LinearOpMode {
                 .addPath(new BezierCurve(
                         new Point(basketScore),
                         new Point(64.000, 125.156, Point.CARTESIAN),
-                        new Point(57.244, 87.644, Point.CARTESIAN)
+                        new Point(62.244, 90.644, Point.CARTESIAN)
                 ))
                 .build();
 
 
         waitForStart();
         if (isStopRequested()) return;
+
+        follower.setMaxPower(0.75);
 
         Actions.runBlocking(
                 new ParallelAction(
@@ -138,36 +184,46 @@ public class YellowBasket extends LinearOpMode {
                         intake.ClawClosed(),
                         follower.followerUpdate(),
                         new SequentialAction(
-                                intake.autoSetWristHide(),
+                                intake.autoSetWristDrop(),
                                 intake.ClawClosed(),
+                                new SleepAction(1),
                                 new ParallelAction(
                                         follower.follow(toRung),
-                                        slide.HighBasket()
+                                        slide.HighBasket(),
+                                        intake.autoSetWristDrop()
                                 ),
+                                new SleepAction(0.5),
                                 intake.autoCycleWheelOut(),
                                 new SleepAction(0.5),
                                 intake.autoCycleWheelStop(),
                                 new ParallelAction(
                                         slide.Base(),
                                         follower.follow(toFirst),
+                                        intake.autoSetWristFlat(),
                                         intake.autoCycleWheelIn()
                                 ),
+                                follower.follow(toFirsthalf),
                                 intake.autoCycleWheelStop(),
                                 new ParallelAction(
                                         follower.follow(toScoreFirst),
+                                        intake.autoSetWristDrop(),
                                         slide.HighBasket()
                                 ),
+                                new SleepAction(0.5),
                                 intake.autoCycleWheelOut(),
                                 new SleepAction(0.5),
                                 intake.autoCycleWheelStop(),
                                 new ParallelAction(
                                         follower.follow(toSecond),
                                         slide.Base(),
-                                        intake.autoCycleWheelIn()
+                                        intake.autoCycleWheelIn(),
+                                        intake.autoSetWristFlat()
                                 ),
+                                follower.follow(toSecondhalf),
                                 intake.autoCycleWheelStop(),
                                 new ParallelAction(
                                         follower.follow(toScoreSecond),
+                                        intake.autoSetWristDrop(),
                                         slide.HighBasket()
                                 ),
                                 intake.autoCycleWheelOut(),
@@ -176,19 +232,23 @@ public class YellowBasket extends LinearOpMode {
                                 new ParallelAction(
                                         follower.follow(toThird),
                                         slide.Base(),
+                                        intake.autoSetWristFlat(),
                                         intake.autoCycleWheelIn()
                                 ),
+                                follower.follow(toThirdhalf),
                                 intake.autoCycleWheelStop(),
                                 new ParallelAction(
                                         follower.follow(toScoreThird),
-                                        slide.HighBasket()
+                                        slide.HighBasket(),
+                                        intake.autoSetWristDrop()
                                 ),
                                 intake.autoCycleWheelOut(),
                                 new SleepAction(0.5),
                                 intake.autoCycleWheelStop(),
                                 new ParallelAction(
                                         follower.follow(toPark),
-                                        slide.HighBar()
+                                        slide.HighBar(),
+                                        intake.autoSetWristDrop()
                                 )
                         )
                 )

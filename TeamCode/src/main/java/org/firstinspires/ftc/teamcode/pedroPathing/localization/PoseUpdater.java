@@ -69,12 +69,12 @@ public class PoseUpdater {
      */
     public PoseUpdater(HardwareMap hardwareMap) {
         // TODO: replace the second argument with your preferred localizer
-        this(hardwareMap, new ThreeWheelIMULocalizer(hardwareMap));
+        this(hardwareMap, new ThreeWheelLocalizer(hardwareMap));
     }
 
     public PoseUpdater(HardwareMap hardwareMap, Pose startPose) {
         // TODO: replace the second argument with your preferred localizer
-        this(hardwareMap, new ThreeWheelIMULocalizer(hardwareMap, startPose));
+        this(hardwareMap, new ThreeWheelLocalizer(hardwareMap, startPose));
     }
     /**
      * This updates the robot's pose, as well as updating the previous pose, velocity, and

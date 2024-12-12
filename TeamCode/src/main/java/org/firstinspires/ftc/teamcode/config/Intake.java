@@ -17,7 +17,7 @@ public class Intake {
     public double gearRackDirection = 0;
     public static double wristPosition = 0;
     public static double wristFlat = 0.835; //0.83
-    public static double wristDrop = 0.50;
+    public static double wristDrop = 0.4925;
     public static double wristBack = 1;
 
     public static double clawPosition = 0;
@@ -138,9 +138,19 @@ public class Intake {
         }
     }
 
-    public Action autoGearRack(double direction) {
-        gearRackDirection = direction;
-        gearRack.setPower(gearRackDirection);
+    public Action autoGearRack() {
+        return new CycleGearRackCl();
+    }
+
+    public class CycleGearRackClOut implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            gearRackDirection = -1;
+            return true;
+        }
+    }
+
+    public Action autoGearRackOut() {
         return new CycleGearRackCl();
     }
 
