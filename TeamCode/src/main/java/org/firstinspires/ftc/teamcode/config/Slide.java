@@ -18,7 +18,7 @@ public class Slide {
     public PIDController controller;
     Gamepad gamepad;
     public static double p=0.006,i=0,d=0.00004,f=0.00006;
-    public DcMotorEx slide;
+    public DcMotorEx slide, leftPivot, rightPivot;
     public final int maxPos = 3250;
     public final int base = 10;
     public final int lowBasket = 10;
@@ -30,7 +30,9 @@ public class Slide {
 
     public int target = 10;
     public Slide(HardwareMap map) {
-        slide = map.get(DcMotorEx.class, "centralLift");
+        slide = map.get(DcMotorEx.class, "slide");
+        leftPivot = map.get(DcMotorEx.class, "leftPivot");
+        rightPivot = map.get(DcMotorEx.class, "rightPivot");
         slide.setDirection(DcMotorSimple.Direction.REVERSE);
         slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -142,6 +144,11 @@ public class Slide {
 
     public void setTargetPosition (int position) {
         target = position;
+    }
+
+    public void movePovit (double power) {
+        leftPivot.setPower(power);
+        rightPivot.setPower(-power);
     }
 
 }

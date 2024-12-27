@@ -59,7 +59,6 @@ public class MMMM extends OpMode {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         Slide slide = new Slide(hardwareMap);
-        Intake intake = new Intake(hardwareMap);
 
         follower.startTeleopDrive();
 
@@ -70,9 +69,7 @@ public class MMMM extends OpMode {
 
     @Override
     public void loop() {
-        //Follower drive = new Follower(hardwareMap);
         Slide slide = new Slide(hardwareMap);
-        Intake intake = new Intake(hardwareMap);
 
         if (gamepad1.right_bumper) {
             speedMod = 0.25;
@@ -88,8 +85,8 @@ public class MMMM extends OpMode {
                 speedModTurn = 0.5;
             }
         }
-        if (bGamepad1.a()) flipDrive = -1;
-        if (bGamepad1.b()) flipDrive = 1;
+        //if (bGamepad1.a()) flipDrive = -1;
+        //if (bGamepad1.b()) flipDrive = 1;
         if (gamepad2.dpad_left) {intake.claw.setPosition(intake.clawPosition);}
 
         speedMod = gamepad1.right_bumper ? 0.25 : (gamepad1.right_trigger>0.5 ? gamepad1.right_trigger : 0.5);
@@ -101,6 +98,8 @@ public class MMMM extends OpMode {
         );
         follower.update();
 
+
+        /*
         if (gamepad2.right_bumper && !gamepad2.left_bumper) {intakeCycleDirection = 1;}
         if (!gamepad2.right_bumper && gamepad2.left_bumper) {intakeCycleDirection = -1;}
         if (!gamepad2.right_bumper && !gamepad2.left_bumper) {intakeCycleDirection = 0;}
@@ -123,9 +122,6 @@ public class MMMM extends OpMode {
 
         intake.cycleIntake(intakeCycleDirection);
 
-        //slide.setCentralLift(-gamepad2.left_stick_y);
-        intake.cycleGearRack(-gamepad2.right_stick_y);
-
         if(gamepad2.y) {intake.setWrist(intake.wristDrop);}
         if (gamepad2.a) {intake.setWrist(intake.wristFlat);}
         if (gamepad2.b) {intake.setWrist(intake.wristBack);}
@@ -144,11 +140,8 @@ public class MMMM extends OpMode {
             slide.setTargetPosition(slide.slide.getCurrentPosition());
         }
 
-        //if (gamepad2.dpad_up && !gamepad2.dpad_down){slide.sethangLift(1);}
-        //if (!gamepad2.dpad_up && gamepad2.dpad_down) {slide.sethangLift(-1);}
-        //if (!gamepad2.dpad_up && !gamepad2.dpad_down) {slide.sethangLift(0);}
 
-        slide.slideToPosition();
+        slide.slideToPosition();*/
 
         telemetry.addData("Speedmod:", speedMod);
         telemetry.addData("SpeedmodTwo:", speedModTwo);
