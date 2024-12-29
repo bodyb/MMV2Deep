@@ -500,6 +500,7 @@ public class Follower {
         }
     }
 
+    //Actions
     public class FollowerUpdate implements Action {
 
         @Override

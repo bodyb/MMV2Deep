@@ -18,6 +18,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 
 import org.firstinspires.ftc.teamcode.config.BetterBoolGamepad;
 import org.firstinspires.ftc.teamcode.config.Intake;
+import org.firstinspires.ftc.teamcode.config.IntakeV2;
+import org.firstinspires.ftc.teamcode.config.Pivot;
 import org.firstinspires.ftc.teamcode.config.Slide;
 import org.firstinspires.ftc.teamcode.pedroPathing.follower.Follower;
 
@@ -27,7 +29,8 @@ public class MMMM extends OpMode {
 
     Follower follower;
     Slide slide;
-    Intake intake;
+    IntakeV2 intake;
+    Pivot pivot;
     private DcMotorEx leftFront;
     private DcMotorEx leftRear;
     private DcMotorEx rightFront;
@@ -40,7 +43,7 @@ public class MMMM extends OpMode {
 
     public double speedModSlide = 1;
 
-    public int intakeCycleDirection = 1;
+    public static int intakeCycleDirection = 0;
     public static int flipDrive = -1;
 
     @Override
@@ -59,6 +62,8 @@ public class MMMM extends OpMode {
         rightFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
         Slide slide = new Slide(hardwareMap);
+        IntakeV2 intake = new IntakeV2(hardwareMap);
+        Pivot pivot = new Pivot(hardwareMap);
 
         follower.startTeleopDrive();
 
@@ -70,6 +75,7 @@ public class MMMM extends OpMode {
     @Override
     public void loop() {
         Slide slide = new Slide(hardwareMap);
+        IntakeV2 intake = new IntakeV2(hardwareMap);
 
         if (gamepad1.right_bumper) {
             speedMod = 0.25;
@@ -85,9 +91,6 @@ public class MMMM extends OpMode {
                 speedModTurn = 0.5;
             }
         }
-        //if (bGamepad1.a()) flipDrive = -1;
-        //if (bGamepad1.b()) flipDrive = 1;
-        if (gamepad2.dpad_left) {intake.claw.setPosition(intake.clawPosition);}
 
         speedMod = gamepad1.right_bumper ? 0.25 : (gamepad1.right_trigger>0.5 ? gamepad1.right_trigger : 0.5);
 
@@ -98,56 +101,52 @@ public class MMMM extends OpMode {
         );
         follower.update();
 
-
-        /*
-        if (gamepad2.right_bumper && !gamepad2.left_bumper) {intakeCycleDirection = 1;}
-        if (!gamepad2.right_bumper && gamepad2.left_bumper) {intakeCycleDirection = -1;}
-        if (!gamepad2.right_bumper && !gamepad2.left_bumper) {intakeCycleDirection = 0;}
-
-        if (gamepad2.dpad_left && !gamepad2.dpad_right) {intake.setClaw(Intake.clawClosed);}
-        if (!gamepad2.dpad_left && gamepad2.dpad_right) {intake.setClaw(Intake.clawOpen);}
-        if (!gamepad2.dpad_left && !gamepad2.dpad_right) {intake.setClaw(intake.claw.getPosition());}
-
         //Davids Control
-        //if (gamepad2.right_trigger >= 0.25) {intakeCycleDirection = 1;}
-        //if (gamepad2.left_trigger >= 0.25) {intakeCycleDirection = -1;}
-        //if (gamepad2.right_trigger <= 0.25 && gamepad2.left_trigger <= 0.25) {intakeCycleDirection = 0;}
+        //Cycler
+        if (gamepad2.right_trigger >= 0.25) {intakeCycleDirection = 1;}
+        else if ((gamepad2.right_trigger < 0.25)) {intakeCycleDirection = 0;}
+        intake.cycleCycler(intakeCycleDirection);
 
-        if (gamepad2.left_trigger > 0.3) {
-            speedModSlide = 0.5;
+        //Wrist / Gate
+        if (gamepad2.x) {intake.teleWrist(intake.wristIntake);}
+        if (gamepad2.b) {intake.teleGate(intake.openGate);}
+        else {intake.teleGate(intake.closeGate);}
+
+        //Claw
+        if (gamepad2.left_trigger >= 0.25) {intake.claw.setPosition(intake.openClaw);}
+        else if (gamepad2.left_trigger < 0.25) {intake.claw.setPosition(intake.closeClaw);}
+
+        //Pivot
+        if (!gamepad2.dpad_down && !gamepad2.dpad_up) {
+            pivot.setManual(gamepad2.right_stick_y);
+            pivot.setTargetPivotPosition(pivot.rightPivot.getCurrentPosition());
         }
-        else {
-            speedModSlide = 1;
+        else if (gamepad2.dpad_down && !gamepad2.dpad_up) {
+            pivot.setTargetPivotPosition(pivot.pivotHover);
         }
-
-        intake.cycleIntake(intakeCycleDirection);
-
-        if(gamepad2.y) {intake.setWrist(intake.wristDrop);}
-        if (gamepad2.a) {intake.setWrist(intake.wristFlat);}
-        if (gamepad2.b) {intake.setWrist(intake.wristBack);}
-
-
-        if (Math.abs(gamepad2.left_stick_y) < 0) {
-            if (gamepad2.dpad_right) {
-                slide.HighBasket();
-            }
-            if (gamepad2.dpad_left) {
-                slide.Base();
-            }
+        else if (!gamepad2.dpad_down && gamepad2.dpad_up) {
+            pivot.setTargetPivotPosition(pivot.pivotDrop);
         }
-        else {
-            slide.setCentralLift(-gamepad2.left_stick_y * speedModSlide);
-            slide.setTargetPosition(slide.slide.getCurrentPosition());
+        pivot.pivotPositionTele();
+
+        //Slide
+        if (!gamepad2.y && !gamepad2.a) {
+            slide.setCentralLiftPower(-gamepad2.left_stick_y);
+            slide.setTargetPosition(slide.slide.getTargetPosition());
+        } else if (gamepad2.y && !gamepad2.a) {
+            slide.setTargetPosition(slide.slideIntake);
+        } else if (!gamepad2.y && gamepad2.a) {
+            slide.setTargetPosition(slide.base);
+            intake.teleWrist(intake.wristHide);
         }
-
-
-        slide.slideToPosition();*/
+        slide.setCentralLift();
 
         telemetry.addData("Speedmod:", speedMod);
         telemetry.addData("SpeedmodTwo:", speedModTwo);
         telemetry.addData("Flip Drive:", flipDrive);
         telemetry.addData("intakeCycleDirection:", intakeCycleDirection);
-        telemetry.addData("slide Position:", slide.slide.getCurrentPosition());
+        telemetry.addData("Slide Position:", slide.slide.getCurrentPosition());
+        telemetry.addData("Pivot Position:", pivot.rightPivot.getCurrentPosition());
         telemetry.update();
     }
 

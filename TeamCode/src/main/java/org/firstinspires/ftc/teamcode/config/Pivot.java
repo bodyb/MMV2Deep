@@ -16,6 +16,8 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+
 @Config
 public class Pivot {
 
@@ -30,10 +32,11 @@ public class Pivot {
 
     public static int target = 0;
     public int targetPivot = 0;
+    public static int pivotDrop, pivotHover;
 
-    public Pivot() {
-        leftPivot = hardwareMap.get(DcMotorEx.class, "leftPivot");
-        rightPivot = hardwareMap.get(DcMotorEx.class, "rightPivot");
+    public Pivot(HardwareMap map) {
+        leftPivot = map.get(DcMotorEx.class, "leftPivot");
+        rightPivot = map.get(DcMotorEx.class, "rightPivot");
 
         controller = new PIDController(p, i, d);
         telemetry = new MultipleTelemetry(telemetry, FtcDashboard.getInstance().getTelemetry());
@@ -47,24 +50,46 @@ public class Pivot {
     public class pivotToPositionCl implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if(target > MAX_POS)
+            if (target > MAX_POS)
                 target = MAX_POS;
-            if(target < 0) {
+            if (target < 0) {
                 target = 0;
             }
-            controller.setPID(p,i,d);
+            controller.setPID(p, i, d);
             int pos = rightPivot.getCurrentPosition();
-            if (pos < 0) {f = 0;}
-            if (0 <= pos && pos <= 20) {f = f1;}
-            if (20 < pos && pos <= 40) {f = f2;}
-            if (40 < pos && pos <= 60) {f = f3;}
-            if (60 < pos && pos <= 80) {f = f4;}
-            if (80 < pos && pos <= 100) {f = f5;}
-            if (100 < pos && pos <= 120) {f = f6;}
-            if (120 < pos && pos <= 140) {f = f7;}
-            if (140 < pos && pos <= 160) {f = f8;}
-            if (160 < pos && pos <= 180) {f = f9;}
-            if (pos < 180) {f=0;}
+            if (pos < 0) {
+                f = 0;
+            }
+            if (0 <= pos && pos <= 20) {
+                f = f1;
+            }
+            if (20 < pos && pos <= 40) {
+                f = f2;
+            }
+            if (40 < pos && pos <= 60) {
+                f = f3;
+            }
+            if (60 < pos && pos <= 80) {
+                f = f4;
+            }
+            if (80 < pos && pos <= 100) {
+                f = f5;
+            }
+            if (100 < pos && pos <= 120) {
+                f = f6;
+            }
+            if (120 < pos && pos <= 140) {
+                f = f7;
+            }
+            if (140 < pos && pos <= 160) {
+                f = f8;
+            }
+            if (160 < pos && pos <= 180) {
+                f = f9;
+            }
+            if (pos < 180) {
+                f = 0;
+            }
             double pid = controller.calculate(pos, target);
             double ff = pos * f;
             double power = pid + ff;
@@ -72,19 +97,54 @@ public class Pivot {
             leftPivot.setPower(power);
             return true;
         }
-        public Action pivotToPosition() {return new pivotToPositionCl();}
+    }
+    public Action pivotToPosition() {return new pivotToPositionCl();}
 
-        public class setPivotCl implements Action{
-            @Override
-            public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-                target = targetPivot;
-                return false;
-            }
+    public class setPivotCl implements Action{
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            target = targetPivot;
+            return false;
         }
+    }
 
-        public Action setPivot(int pos) {
-            targetPivot = pos;
-            return new setPivotCl();
+    public Action setPivot(int pos) {
+        targetPivot = pos;
+        return new setPivotCl();
+    }
+
+    public void pivotPositionTele() {
+        if(target > MAX_POS)
+            target = MAX_POS;
+        if(target < 0) {
+            target = 0;
         }
+        controller.setPID(p,i,d);
+        int pos = rightPivot.getCurrentPosition();
+        if (pos < 0) {f = 0;}
+        if (0 <= pos && pos <= 20) {f = f1;}
+        if (20 < pos && pos <= 40) {f = f2;}
+        if (40 < pos && pos <= 60) {f = f3;}
+        if (60 < pos && pos <= 80) {f = f4;}
+        if (80 < pos && pos <= 100) {f = f5;}
+        if (100 < pos && pos <= 120) {f = f6;}
+        if (120 < pos && pos <= 140) {f = f7;}
+        if (140 < pos && pos <= 160) {f = f8;}
+        if (160 < pos && pos <= 180) {f = f9;}
+        if (pos < 180) {f=0;}
+        double pid = controller.calculate(pos, target);
+        double ff = pos * f;
+        double power = pid + ff;
+        rightPivot.setPower(power);
+        leftPivot.setPower(power);
+    }
+
+    public void setTargetPivotPosition(int pos) {
+        target = pos;
+    }
+
+    public void setManual(double power) {
+        rightPivot.setPower(power * 0.2);
+        leftPivot.setPower(power * 0.2);
     }
 }

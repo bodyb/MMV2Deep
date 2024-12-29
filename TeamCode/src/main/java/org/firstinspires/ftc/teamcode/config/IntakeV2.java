@@ -13,11 +13,13 @@ import com.qualcomm.robotcore.hardware.Servo;
 @Config
 public class IntakeV2 {
 
-    public Servo wristLeft, wristRight, claw;
+    public Servo wristLeft, wristRight, claw, gate;
     public DcMotorEx cycler;
 
-    public double targetClawPosition, targetWristPosition, targetClawPosition2, targetWristPosition2;
+    public static double targetClawPosition, targetWristPosition, targetClawPosition2, targetWristPosition2, gateTargetPosition, gateTargetPosition2;
     public int cycleDirection, cycleDirection2;
+    public static double wristIntake, WristDrop, wristHide, openClaw, closeClaw;
+    public static double openGate, closeGate;
 
     public IntakeV2(HardwareMap map) {
         wristLeft = map.servo.get("wristLeft");
@@ -36,7 +38,7 @@ public class IntakeV2 {
     public Action moveClaw(double pos) {
         return new moveClawCl();
     }
-    public class moveClawClNum implements Action {
+    public class setClawCl implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             targetClawPosition = targetClawPosition2;
@@ -45,7 +47,7 @@ public class IntakeV2 {
     }
     public Action setClaw(double pos) {
         targetClawPosition2 = pos;
-        return new moveClawClNum();
+        return new setClawCl();
     }
     public class moveWristCl implements Action {
         @Override
@@ -58,7 +60,7 @@ public class IntakeV2 {
     public Action moveWrist(){
         return new moveWristCl();
     }
-    public class moveWristClNum implements Action {
+    public class setWristCl implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             targetWristPosition = targetWristPosition2;
@@ -67,14 +69,63 @@ public class IntakeV2 {
     }
     public Action setWrist(double pos) {
         targetWristPosition2 = pos;
-        return new moveWristClNum();
+        return new setWristCl();
     }
 
+    public void teleWrist(double pos) {
+        wristLeft.setPosition(pos);
+        wristRight.setPosition(pos);
+    }
+    //Cycler
     public class moveCyclerCl implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             cycler.setPower(cycleDirection);
             return false;
         }
+    }
+
+    public Action moveCycler() {return new moveCyclerCl();}
+
+    public class setCyclerCl implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket){
+            cycleDirection = cycleDirection2;
+            return true;
+        }
+    }
+
+    public Action setCycler(int direction){
+        cycleDirection2 = direction;
+        return new setCyclerCl();
+    }
+
+    public void cycleCycler(int direction) {
+        cycler.setPower(direction);
+    }
+
+    public class moveGateCl implements Action{
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            gate.setPosition(gateTargetPosition);
+            return true;
+        }
+    }
+    public Action moveGate() {return new moveGateCl();}
+
+    public class setGateCl implements Action{
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            gateTargetPosition = gateTargetPosition2;
+            return false;
+        }
+    }
+    public Action setGate(double pos) {
+        gateTargetPosition2 = pos;
+        return new setGateCl();
+    }
+
+    public void teleGate(double pos){
+        gate.setPosition(pos);
     }
 }

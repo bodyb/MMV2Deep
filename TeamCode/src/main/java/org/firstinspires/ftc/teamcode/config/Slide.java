@@ -26,6 +26,7 @@ public class Slide {
     public final int lowBar = 10;
     public final int highBar = 1450;
     public final int unclip = 1250;
+    public static int slideIntake;
 
 
     public int target = 10;
@@ -138,17 +139,21 @@ public class Slide {
         return new checkSlideClass();
     }
 
-    public void setCentralLift(double Pow) {
+    public void setCentralLiftPower(double Pow) {
         slide.setPower(Pow);
     }
 
-    public void setTargetPosition (int position) {
+    public void setCentralLift() {
+        int pos = slide.getCurrentPosition();
+        double pid = controller.calculate(pos, target);
+        double ff = pos * f;
+        double power = pid + ff;
+        slide.setPower(power);
+    }
+
+    public void setTargetPosition(int position) {
         target = position;
     }
 
-    public void movePovit (double power) {
-        leftPivot.setPower(power);
-        rightPivot.setPower(-power);
-    }
 
 }
