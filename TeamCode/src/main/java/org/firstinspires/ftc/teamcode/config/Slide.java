@@ -114,41 +114,6 @@ public class Slide {
     public Action UnClip() {
         return new setUnclipCl();
     }
-
-    public class RestEncoderCl implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            slide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-            slide.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            return false;
-        }
-    }
-
-    public Action ResetEncoder() {
-        return new RestEncoderCl();
-    }
-
-    /*public class CentralLift implements Action {
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            slide.setPower(gamepad2.left_stick_y);
-            return true;
-        }
-    }*/
-
-    public class checkSlideClass implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            if (slide.getCurrentPosition() > 200) {
-                target = base;
-            }
-            return false;
-        }
-    }
-
-    public Action checkSlide() {
-        return new checkSlideClass();
-    }
-
     public void setCentralLiftPower(double Pow) {
         slide.setPower(Pow);
     }

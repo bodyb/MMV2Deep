@@ -151,7 +151,7 @@ public class MMMM extends OpMode {
         telemetry.addData("intakeCycleDirection:", intakeCycleDirection);
         telemetry.addData("Slide Position:", slide.slide.getCurrentPosition());
         telemetry.addData("Pivot Position:", pivot.rightPivot.getCurrentPosition());
-        telemetry.addData("Slide Length:", slide.checkSlide());
+        telemetry.addData("Slide Length:", slide.checkLength());
         telemetry.update();
     }
 
