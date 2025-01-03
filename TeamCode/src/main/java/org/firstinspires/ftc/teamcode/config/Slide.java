@@ -18,14 +18,17 @@ public class Slide {
     public PIDController controller;
     Gamepad gamepad;
     public static double p=0.006,i=0,d=0.00004,f=0.00006;
-    public DcMotorEx slide, leftPivot, rightPivot;
-    public final int maxPos = 3250;
-    public final int base = 10;
-    public final int lowBasket = 10;
-    public final int highBasket = 3100;
-    public final int lowBar = 10;
-    public final int highBar = 1450;
-    public final int unclip = 1250;
+    public static DcMotorEx slide;
+    public DcMotorEx leftPivot;
+    public DcMotorEx rightPivot;
+    public static int maxPos = 3250;
+    public static int absoluteMax = 3250;
+    public static int base = 10;
+    public static int lowBasket = 10;
+    public static int highBasket = 3100;
+    public static int lowBar = 10;
+    public static int highBar = 1450;
+    public static int unclip = 1250;
     public static int slideIntake;
 
 
@@ -45,6 +48,13 @@ public class Slide {
     public class SlideToPosition implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            if (target > maxPos)
+                target = maxPos;
+            if (target > absoluteMax)
+                target = absoluteMax;
+            if (target < 0) {
+                target = 0;
+            }
             int pos = slide.getCurrentPosition();
             double pid = controller.calculate(pos, target);
             double ff = pos * f;
@@ -153,6 +163,13 @@ public class Slide {
 
     public void setTargetPosition(int position) {
         target = position;
+    }
+
+    public static String checkLength() {
+        if (slide.getCurrentPosition() < absoluteMax/3) {return "Retracted";}
+        if (slide.getCurrentPosition() >= absoluteMax/3 && slide.getCurrentPosition() < 2*absoluteMax/3) {return "Half";}
+        if (slide.getCurrentPosition() >= 2*absoluteMax/3) {return "Full";}
+        else return "None";
     }
 
 

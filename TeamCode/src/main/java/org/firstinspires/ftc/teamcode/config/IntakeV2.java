@@ -35,7 +35,7 @@ public class IntakeV2 {
             return false;
         }
     }
-    public Action moveClaw(double pos) {
+    public Action moveClaw() {
         return new moveClawCl();
     }
     public class setClawCl implements Action {

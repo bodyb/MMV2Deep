@@ -108,7 +108,9 @@ public class MMMM extends OpMode {
         intake.cycleCycler(intakeCycleDirection);
 
         //Wrist / Gate
-        if (gamepad2.x) {intake.teleWrist(intake.wristIntake);}
+        if (gamepad2.x && !gamepad2.dpad_left) {intake.teleWrist(intake.wristIntake);}
+        if (!gamepad2.x && gamepad2.dpad_left) {intake.teleWrist(intake.wristHide);}
+        if (!gamepad2.x && !gamepad2.dpad_left) {intake.teleWrist(intake.wristLeft.getPosition());}
         if (gamepad2.b) {intake.teleGate(intake.openGate);}
         else {intake.teleGate(intake.closeGate);}
 
@@ -128,6 +130,7 @@ public class MMMM extends OpMode {
             pivot.setTargetPivotPosition(pivot.pivotDrop);
         }
         pivot.pivotPositionTele();
+        pivot.pivotDegree = pivot.calcDegree();
 
         //Slide
         if (!gamepad2.y && !gamepad2.a) {
@@ -140,6 +143,7 @@ public class MMMM extends OpMode {
             intake.teleWrist(intake.wristHide);
         }
         slide.setCentralLift();
+        slide.maxPos = (int) (40 * Math.cos(pivot.pivotDegree));
 
         telemetry.addData("Speedmod:", speedMod);
         telemetry.addData("SpeedmodTwo:", speedModTwo);
@@ -147,6 +151,7 @@ public class MMMM extends OpMode {
         telemetry.addData("intakeCycleDirection:", intakeCycleDirection);
         telemetry.addData("Slide Position:", slide.slide.getCurrentPosition());
         telemetry.addData("Pivot Position:", pivot.rightPivot.getCurrentPosition());
+        telemetry.addData("Slide Length:", slide.checkSlide());
         telemetry.update();
     }
 
